@@ -1,6 +1,7 @@
 import P5 from "p5";
 
 import { Network } from "./Network";
+import { format } from "./utils";
 
 interface Config {
   width: number
@@ -104,7 +105,7 @@ export function draw(network: Network, inputLabels?: string[], outputLabels?: st
 
           p5.fill(activation > 0.5 ? 0 : 255);
           p5.noStroke();
-          p5.text(Math.round(activation * 100) / 100, x, y + 7);
+          p5.text(format(activation), x, y + 7);
         });
       });
 

@@ -1,3 +1,5 @@
-import { create, matrixDependencies } from 'mathjs';
+import { create, addDependencies, mapDependencies, multiplyDependencies, transposeDependencies } from 'mathjs';
 
-export const { add, map, multiply } = create({ matrixDependencies }, {});
+const math = create({ addDependencies, mapDependencies, multiplyDependencies, transposeDependencies }, {});
+
+export const { add, map, multiply, transpose } = math;

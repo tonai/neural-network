@@ -6,6 +6,10 @@ export function random(from: number, to: number): number {
   return Math.random() * (to - from) + from;
 }
 
+export function format(number: number): number {
+  return Math.round(number * 100) / 100;
+}
+
 export function sigmoid(x: number): number {
   return 1 / ( 1 + Math.exp(-x) );
 }

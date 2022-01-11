@@ -1,37 +1,36 @@
 import { add, map, multiply } from 'mathjs';
 
-// import { Neuron } from './Neuron';
 import { rand, sigmoid } from './utils';
 
 export class Layer {
   // Column matrice: [[a0] [a1] ... [an]]
-  // neurons: [Neuron][] = [];
   activations: [number][] = [];
 
   // Column matrice: [[b0] [b1] ... [bn]]
   biases: [number][] = [];
 
   constructor(numberOfNeurons: number) {
-    for(let i = 0; i < numberOfNeurons; i++) {
-      // this.neurons.push([new Neuron()]);
+    for(let j = 0; j < numberOfNeurons; j++) {
       this.activations.push([0]);
       this.biases.push([rand()]);
     }
   }
 
   setActivations(input: number[]) {
-    for (let i = 0; i < input.length; i++) {
-      // this.neurons[i][0].activation = input[i];
-      this.activations[i][0] = input[i];
+    for (let j = 0; j < input.length; j++) {
+      this.activations[j][0] = input[j];
     }
   }
 
   getActivations(): number[] {
-    // return this.neurons.map(([neuron]) => neuron.activation);
     return this.activations.map(([activation]) => activation);
   }
 
+  getZ(activations: [number][], weights: number[][]): [number][] {
+    return add(multiply(weights, activations), this.biases) as [number][];
+  }
+
   calculateActivations(activations: [number][], weights: number[][]) {
-    this.activations = map(add(multiply(weights, activations), this.biases) as [number][], sigmoid);
+    this.activations = map(this.getZ(activations, weights), sigmoid);
   }
 }
