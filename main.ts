@@ -24,7 +24,7 @@ const desiredOutputs = [
   [0, 0, 0, 0, 0, 1]
 ];
 
-const network = new Network([3, 4, 6], 5);
+const network = new Network([3, 4, 5, 6], 5);
 draw(network, inputLabels, outputLabels);
 
 const colorEl = document.getElementById('color') as HTMLInputElement;

@@ -136,22 +136,42 @@ export class Network {
       sigmoidPrime
     ); 
 
+    // Impact on cost relative to weights: dCdWl = dZldWl . dAldZl . dCdAl = dZldWl . delta
+    const dWs = [];
+
+    // Impact on cost relative to biases: dCdBl = dZldBl . dAldZl . dCdAl = dZldBl . delta
+    const dBs = [];
+
+    this.getLayerDelta(l, dCdAl.map(([x]) => x), dWs, dBs);
+
+    return { dWs, dBs };
+  }
+
+  getLayerDelta(l: number, dCdAl: number[], dWs: number[][][], dBs: number[][]) {
+    // Impact on activation relative to Z (Column matrice)
+    const dAldZl: [number][] = map(
+      this.layers[l].getZ(
+        this.layers[l - 1].activations,
+        this.weights[l - 1].weights
+      ),
+      sigmoidPrime
+    ); 
+ 
     // Impact on Z relative to weights (Column matrice)
     const dZldWl: [number][] = this.layers[l - 1].activations;
-
+ 
     // Impact on Z relative to biases
     const dZldBl = 1;
-
+ 
     // Impact on Z relative to previous activation
     const dZldAlminus1: number[][] = this.weights[l - 1].weights;
-
-    const dWs = []; // Impact on cost relative to weights: dCdWl = dZldWl . dAldZl . dCdAl = dZldWl . delta
-    const dBs = []; // Impact on cost relative to biases: dCdBl = dZldBl . dAldZl . dCdAl = dZldBl . delta
-    const dAs = []; // Impact on cost relative to previous activation: dCdAl-1 = dZldAl-1 . dAldZl . dCdAl = dZldAl-1 . delta
-
+ 
+    // Impact on cost relative to previous activation: dCdAl-1 = dZldAl-1 . dAldZl . dCdAl = dZldAl-1 . delta
+    const dCdAlminus1: number[] = [];
+ 
     const weights = this.weights[l - 1].weights;
     for (let j = 0; j < weights.length; j++) {
-      const delta = dAldZl[j][0] * dCdAl[j][0];
+      const delta = dAldZl[j][0] * dCdAl[j];
       // dWs
       for (let k = 0; k < weights[j].length; k++) {
         dWs[l - 1] ||= [];
@@ -163,44 +183,12 @@ export class Network {
       dBs[l - 1].push(dZldBl * delta);
       // dAs
       for (let k = 0; k < weights[j].length; k++) {
-        dAs[j] = (dAs[j] || 0) + dZldAlminus1[j][k] * delta;
+        dCdAlminus1[j] = (dCdAlminus1[j] || 0) + dZldAlminus1[j][k] * delta;
       }
     }
 
-    //////////////////////////////
-    l = l - 1;
-
-    // Impact on activation relative to Z (Column matrice)
-    const dAldZl1: [number][] = map(
-      this.layers[l].getZ(
-         this.layers[l - 1].activations,
-         this.weights[l - 1].weights
-       ),
-       sigmoidPrime
-     ); 
-
-     // Impact on Z relative to weights (Column matrice)
-     const dZldWl1: [number][] = this.layers[l - 1].activations;
- 
-     // Impact on Z relative to biases
-     const dZldBl1 = 1;
-
-    const dWs1 = []; // Impact on cost relative to weights: dCdWl-1 = dZl-1dWl-1 . dAl-1dZl-1 . dCdAl-1 = dZl-1dWl-1 . delta
-    // Impact on cost relative to biases: dAl-1dBl = dZl-1dBl . dAl-1dZl-1 . dCdAl-1 = dZl-1dBl . delta
-    const weights1 = this.weights[l - 1].weights;
-    for (let j = 0; j < weights1.length; j++) {
-      const delta = dAldZl1[j][0] * dAs[j];
-      // dWs
-      for (let k = 0; k < weights1[j].length; k++) {
-        dWs[l - 1] ||= [];
-        dWs[l - 1][j] ||= [];
-        dWs[l - 1][j][k] = dZldWl1[k][0] * delta;
-      }
-      // dBs
-      dBs[l - 1] ||= [];
-      dBs[l - 1].push(dZldBl1 * delta);
+    if (l - 1 > 0) {
+      this.getLayerDelta(l - 1, dCdAlminus1, dWs, dBs);
     }
-
-    return { dWs, dBs };
   }
 }
