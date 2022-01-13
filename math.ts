@@ -1,5 +1,5 @@
-import { create, addDependencies, mapDependencies, multiplyDependencies, transposeDependencies } from 'mathjs';
+import { create, addDependencies, mapDependencies, multiplyDependencies } from 'mathjs';
 
-const math = create({ addDependencies, mapDependencies, multiplyDependencies, transposeDependencies }, {});
+const math = create({ addDependencies, mapDependencies, multiplyDependencies }, {});
 
-export const { add, map, multiply, transpose } = math;
+export const { add, map, multiply } = math;
