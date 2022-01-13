@@ -33,3 +33,14 @@ export function convertToHex(input: [number, number, number] ): string {
   hex[2] = Math.round(input[2] * 255).toString(16).padStart(2, '0');
   return hex.join('');
 }
+
+export function shuffle(array) {
+  let currentIndex = array.length,  randomIndex;
+  while (currentIndex != 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}

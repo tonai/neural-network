@@ -3,6 +3,11 @@ import { Layer } from "./Layer";
 import { Weights } from "./Weights";
 import { sigmoidPrime } from "./utils";
 
+interface Model {
+  weights: number[][][]
+  biases: [number][][]
+}
+
 export class Network {
   // X layers
   layers: Layer[] = [];
@@ -127,15 +132,6 @@ export class Network {
       )
     ) as [number][];
 
-    // Impact on activation relative to Z (Column matrice)
-    const dAldZl: [number][] = map(
-     this.layers[l].getZ(
-        this.layers[l - 1].activations,
-        this.weights[l - 1].weights
-      ),
-      sigmoidPrime
-    ); 
-
     // Impact on cost relative to weights: dCdWl = dZldWl . dAldZl . dCdAl = dZldWl . delta
     const dWs = [];
 
@@ -183,12 +179,33 @@ export class Network {
       dBs[l - 1].push(dZldBl * delta);
       // dAs
       for (let k = 0; k < weights[j].length; k++) {
-        dCdAlminus1[j] = (dCdAlminus1[j] || 0) + dZldAlminus1[j][k] * delta;
+        dCdAlminus1[k] = (dCdAlminus1[k] || 0) + dZldAlminus1[j][k] * delta;
       }
     }
 
     if (l - 1 > 0) {
       this.getLayerDelta(l - 1, dCdAlminus1, dWs, dBs);
+    }
+  }
+
+  export(): Model {
+    const weights: number[][][] = [];
+    const biases: [number][][] = [];
+    for (let i = 0; i < this.weights.length; i++) {
+      weights[i] = this.weights[i].weights;
+    }
+    for (let i = 0; i < this.layers.length; i++) {
+      biases[i] = this.layers[i].biases;
+    }
+    return { weights, biases };
+  }
+
+  import(model: Model) {
+    for (let i = 0; i < model.weights.length; i++) {
+      this.weights[i].weights = model.weights[i];
+    }
+    for (let i = 0; i < model.biases.length; i++) {
+      this.layers[i].biases = model.biases[i];
     }
   }
 }
