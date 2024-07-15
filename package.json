@@ -4,9 +4,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build -- --base=/neural-network/",
+    "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
+    "gh-pages": "^6.1.1",
     "vite": "^2.7.2"
   },
   "dependencies": {
@@ -14,5 +17,8 @@
     "mnist": "^1.1.0",
     "p5": "^1.4.0",
     "typescript": "^4.5.4"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
